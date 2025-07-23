@@ -13,7 +13,9 @@ function createWindow() {
     frame: true,
     icon: path.join(__dirname, '/resources/filmstrip.png'),
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: false,
+      preload: path.join(__dirname, 'preload.js')
     }
   })
 

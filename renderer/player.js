@@ -77,7 +77,6 @@ module.exports = {
 
       //Clear selected files
       $('#filePicker').val('')
-      console.log($('#filePicker').prop('files'))
       $('#files').html('Select Files')
 
       //Reset player variables
@@ -193,11 +192,11 @@ module.exports = {
 
       // If the icf file is the only one selected
       if (icfFileExists && (!jsonFileExists || !videoFileExists)) {
-        const icfData = fs.readFileSync(icfFile['path'])
+        const icfData = fs.readFileSync(customFileHandler.showFilePath(icfFile))
         const icfObj = JSON.parse(icfData)
 
-        const jsonPath = icfFile['path'].replace(/\/[^\/]*$/, '/' + icfObj['annotation'])
-        const videoPath = icfFile['path'].replace(/\/[^\/]*$/, '/.ic/' + icfObj['video'])
+        const jsonPath = customFileHandler.showFilePath(icfFile).replace(/\/[^\/]*$/, '/' + icfObj['annotation'])
+        const videoPath = customFileHandler.showFilePath(icfFile).replace(/\/[^\/]*$/, '/.ic/' + icfObj['video'])
 
         jsonFileExists = true
         jsonFile = {
@@ -221,17 +220,25 @@ module.exports = {
     generateICDirectory: () => {
       var HOME = process.env.HOME
       var videoFile = document.getElementById('mp4FilePicker').files[0]
+      var videoFilePath = customFileHandler.showFilePath(videoFile);
+      if (videoFilePath === undefined) {
+        videoFilePath = '';
+      }
       var jsonFile = document.getElementById('jsonFilePicker').files[0]
+      var jsonFilePath = customFileHandler.showFilePath(jsonFile);
+      if (jsonFilePath === undefined) {
+        jsonFilePath = '';
+      }
       var stem = videoFile.name.split(`.`)[0]
       var dirName = HOME + `/Desktop/` + stem
       var hiddenDirName = dirName + `/.ic`
       if (!fs.existsSync(hiddenDirName)){
         fs.mkdirSync(hiddenDirName, { recursive: true });
       }
-      fs.copyFile(videoFile.path, hiddenDirName + `/` + videoFile.name, (err) => {if (err) alert(err)})
+      fs.copyFile(videoFilePath, hiddenDirName + `/` + videoFile.name, (err) => {if (err) alert(err)})
 
       if (jsonFile) {
-        fs.copyFile(jsonFile.path, dirName + `/` + stem + `.json`, (err) => {if (err) alert(err)})
+        fs.copyFile(jsonFilePath, dirName + `/` + stem + `.json`, (err) => {if (err) alert(err)})
         jsonPath = stem + '.json'
       } else { jsonPath = null}
 
@@ -294,8 +301,8 @@ module.exports = {
 
     // Parse jsonFile and initialize player
     parseNPlay: (jsonFile, initializeCallback) => {
-      player.jsonFilePath = jsonFile['path']
-      fs.readFile(jsonFile['path'], (err, fileData) => {
+      player.jsonFilePath = jsonFile.path
+      fs.readFile(jsonFile.path, (err, fileData) => {
         if (err) {
           return err;
         }
@@ -344,7 +351,7 @@ module.exports = {
       const files = player.getSelectedFiles()
 
       // Set video src to given file
-      let videoPath = files['videoFile']['path']
+      let videoPath = files['videoFile'].path
       player.$videoObj.prop('src', videoPath)
 
       // Show Player
