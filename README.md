@@ -1,6 +1,8 @@
 # electron_player
 An alternative video player for BYU International Cinemas (based on Electron)
 
+> THIS REPOSITORY HAS BEEN MOVED TO [yvideo-py](https://github.com/BYU-ODH/yvideo-py/tree/main/IC_player) in order to unify player logic.
+
 
 ## Installation
 
